@@ -9,8 +9,8 @@ interface Sequence {
   partType: string;
   timestamp: number;
   changeData: {
-    text: string;
-    removed: string;
+    text: string[];
+    removed: string[];
     origin: string;
   };
 }
@@ -58,8 +58,8 @@ export const InputArea: React.FC = () => {
     }
 
     const changeData = {
-      text: "",
-      removed: "",
+      text: [""],
+      removed: [""],
       origin: "",
     };
 
@@ -68,11 +68,11 @@ export const InputArea: React.FC = () => {
     const diffLength = textInput.length - beforeTextInput.length;
     if (diffLength > 0) {
       //console.log("追加:" + diffLength + "timestatmp:" + timestamp);
-      changeData.text = createText(diffLength);
+      changeData.text = [createText(diffLength)];
       changeData.origin = "+input";
     } else if (diffLength < 0) {
       //console.log("削除" + Math.abs(diffLength), "timestatmp:" + timestamp);
-      changeData.removed = createText(Math.abs(diffLength));
+      changeData.removed = [createText(Math.abs(diffLength))];
       changeData.origin = "+delete";
     }
 
