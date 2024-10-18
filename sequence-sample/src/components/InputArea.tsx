@@ -23,12 +23,12 @@ export const InputArea: React.FC = () => {
 
   //timestamp関連
   const [timestamp, setTimestamp] = React.useState(0);
-  const delay = 100;
+  const delay = 1;
   const [isRunning, setIsRunning] = React.useState(false);
 
   useInterval(
     () => {
-      setTimestamp(timestamp + 100);
+      setTimestamp(timestamp + 1);
     },
     isRunning ? delay : null
   );
@@ -65,7 +65,7 @@ export const InputArea: React.FC = () => {
 
     //console.log("変更前のtextarea1: ", beforeTextInput);
     //console.log("変更後のtextarea1: ", textInput);
-    const diffLength = textInput.length - beforeTextInput.length;
+    /*const diffLength = textInput.length - beforeTextInput.length;
     if (diffLength > 0) {
       //console.log("追加:" + diffLength + "timestatmp:" + timestamp);
       changeData.text = [createText(diffLength)];
@@ -74,7 +74,18 @@ export const InputArea: React.FC = () => {
       //console.log("削除" + Math.abs(diffLength), "timestatmp:" + timestamp);
       changeData.removed = [createText(Math.abs(diffLength))];
       changeData.origin = "+delete";
-    }
+    }*/
+
+    /*const result = findAddedAndRemovedChars(beforeTextInput, textInput);
+    if (result.added.length > 0) {
+      changeData.text = result.added.map((char) => char.char.repeat(char.count));
+      changeData.origin = "+input";
+    } else if (result.removed.length > 0) {
+      changeData.removed = result.removed.map((char) => char.char.repeat(char.count));
+      changeData.origin = "+delete";
+    }*/
+
+    //ライブラリを使用して差分を取得
 
     const newSequence = {
       id: 1,
@@ -87,15 +98,6 @@ export const InputArea: React.FC = () => {
 
     setBeforeTextInput(textInput);
   }, [textInput, beforeTextInput]);
-
-  //追加・削除された文字の数だけ、aを繋げた文字列を作成
-  const createText = (diffLength: number) => {
-    let text = "";
-    for (let i = 0; i < diffLength; i++) {
-      text += "a";
-    }
-    return text;
-  };
 
   return (
     <>
