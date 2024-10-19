@@ -1,6 +1,8 @@
 import ReactCodeMirror from "@uiw/react-codemirror";
 import { SetStateAction, useCallback, useEffect } from "react";
 
+import { TimestampContext } from "./TimestampProvider";
+
 import React from "react";
 import useInterval from "./useInterval";
 
@@ -24,7 +26,8 @@ export const InputArea: React.FC = () => {
   const [sequenceList, setSequenceList] = React.useState<Sequence[]>([]);
 
   //timestamp関連
-  const [timestamp, setTimestamp] = React.useState(0);
+  const { timestamp, setTimestamp, resetTimestamp } =
+    React.useContext(TimestampContext);
   const delay = 1;
   const [isRunning, setIsRunning] = React.useState(false);
 
@@ -45,7 +48,7 @@ export const InputArea: React.FC = () => {
     } else {
       console.log("カウントアップが停止しました。");
       console.log("sequenceList: ", sequenceList);
-      setTimestamp(0);
+      resetTimestamp();
       resetSequenceList();
     }
   }, [isRunning]);
