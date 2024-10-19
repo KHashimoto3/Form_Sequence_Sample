@@ -4,6 +4,8 @@ import { SetStateAction, useCallback, useEffect } from "react";
 import React from "react";
 import useInterval from "./useInterval";
 
+import * as diff from "diff";
+
 interface Sequence {
   id: number;
   partType: string;
@@ -52,6 +54,23 @@ export const InputArea: React.FC = () => {
     setSequenceList([]);
   };
 
+  const calculateDiff = (before: string, after: string) => {
+    const changes = diff.diffChars(before, after);
+
+    let added = "";
+    let removed = "";
+
+    changes.forEach((change) => {
+      if (change.added) {
+        added += change.value;
+      } else if (change.removed) {
+        removed += change.value;
+      }
+    });
+
+    return { added, removed };
+  };
+
   useEffect(() => {
     if (textInput === beforeTextInput) {
       return;
@@ -63,29 +82,16 @@ export const InputArea: React.FC = () => {
       origin: "",
     };
 
-    //console.log("変更前のtextarea1: ", beforeTextInput);
-    //console.log("変更後のtextarea1: ", textInput);
-    /*const diffLength = textInput.length - beforeTextInput.length;
-    if (diffLength > 0) {
-      //console.log("追加:" + diffLength + "timestatmp:" + timestamp);
-      changeData.text = [createText(diffLength)];
-      changeData.origin = "+input";
-    } else if (diffLength < 0) {
-      //console.log("削除" + Math.abs(diffLength), "timestatmp:" + timestamp);
-      changeData.removed = [createText(Math.abs(diffLength))];
-      changeData.origin = "+delete";
-    }*/
-
-    /*const result = findAddedAndRemovedChars(beforeTextInput, textInput);
-    if (result.added.length > 0) {
-      changeData.text = result.added.map((char) => char.char.repeat(char.count));
-      changeData.origin = "+input";
-    } else if (result.removed.length > 0) {
-      changeData.removed = result.removed.map((char) => char.char.repeat(char.count));
-      changeData.origin = "+delete";
-    }*/
-
     //ライブラリを使用して差分を取得
+    const { added, removed } = calculateDiff(beforeTextInput, textInput);
+
+    if (added.length > 0) {
+      changeData.text = [added];
+      changeData.origin = "+input";
+    } else if (removed.length > 0) {
+      changeData.removed = [removed];
+      changeData.origin = "+delete";
+    }
 
     const newSequence = {
       id: 1,
