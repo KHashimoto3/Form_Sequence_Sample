@@ -1,15 +1,16 @@
-import React from "react";
-import { InputArea } from "./components/InputArea";
+import { SequenceDataProvider } from "./components/SequenceDataProvider";
 import { TimestampProvider } from "./components/TimestampProvider";
+import { Form } from "./Form";
 
 function App() {
   return (
     <>
       <TimestampProvider>
-        <div>
-          <h1>Sequence Sample</h1>
-          <InputArea />
-        </div>
+        <SequenceDataProvider>
+          <div>
+            <Form />
+          </div>
+        </SequenceDataProvider>
       </TimestampProvider>
     </>
   );

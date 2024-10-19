@@ -1,11 +1,12 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { createContext, Dispatch, SetStateAction } from "react";
+import useInterval from "./useInterval";
 
 export const TimestampContext = createContext(
   {} as {
     timestamp: number;
-    setTimestamp: Dispatch<SetStateAction<number>>;
-    resetTimestamp: () => void;
+    isRunning: boolean;
+    setIsRunning: Dispatch<SetStateAction<boolean>>;
   }
 );
 
@@ -14,15 +15,23 @@ export const TimestampProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
   const [timestamp, setTimestamp] = React.useState(0);
+  const [isRunning, setIsRunning] = React.useState(true);
 
-  const resetTimestamp = () => {
-    setTimestamp(0);
-  };
+  useInterval(
+    () => {
+      setTimestamp(timestamp + 1);
+    },
+    isRunning ? 1 : null
+  );
+
+  useEffect(() => {
+    if (!isRunning) {
+      setTimestamp(0);
+    }
+  }, [isRunning]);
 
   return (
-    <TimestampContext.Provider
-      value={{ timestamp, setTimestamp, resetTimestamp }}
-    >
+    <TimestampContext.Provider value={{ timestamp, isRunning, setIsRunning }}>
       {children}
     </TimestampContext.Provider>
   );

@@ -2,62 +2,25 @@ import ReactCodeMirror from "@uiw/react-codemirror";
 import { SetStateAction, useCallback, useEffect } from "react";
 
 import { TimestampContext } from "./TimestampProvider";
+import { SequenceContext } from "./SequenceDataProvider";
 
 import React from "react";
-import useInterval from "./useInterval";
 
 import * as diff from "diff";
-
-interface Sequence {
-  id: number;
-  partType: string;
-  timestamp: number;
-  changeData: {
-    text: string[];
-    removed: string[];
-    origin: string;
-  };
-}
+import { SequenceData } from "./types/sequenceData";
 
 export const InputArea: React.FC = () => {
   const [beforeTextInput, setBeforeTextInput] = React.useState("");
   const [textInput, setTextInput] = React.useState("");
 
-  const [sequenceList, setSequenceList] = React.useState<Sequence[]>([]);
+  const { addNewSequenceData } = React.useContext(SequenceContext);
 
   //timestamp関連
-  const { timestamp, setTimestamp, resetTimestamp } =
-    React.useContext(TimestampContext);
-  const delay = 1;
-  const [isRunning, setIsRunning] = React.useState(false);
-
-  useInterval(
-    () => {
-      setTimestamp(timestamp + 1);
-    },
-    isRunning ? delay : null
-  );
+  const { timestamp } = React.useContext(TimestampContext);
 
   const onChange = useCallback((val: SetStateAction<string>) => {
     setTextInput(val);
   }, []);
-
-  useEffect(() => {
-    if (isRunning) {
-      console.log("カウントアップが開始しました。");
-      setTextInput("");
-      setBeforeTextInput("");
-    } else {
-      console.log("カウントアップが停止しました。");
-      console.log("sequenceList: ", sequenceList);
-      resetTimestamp();
-      resetSequenceList();
-    }
-  }, [isRunning]);
-
-  const resetSequenceList = () => {
-    setSequenceList([]);
-  };
 
   const calculateDiff = (before: string, after: string) => {
     const changes = diff.diffChars(before, after);
@@ -82,6 +45,14 @@ export const InputArea: React.FC = () => {
     }
 
     const changeData = {
+      from: {
+        line: 0,
+        ch: 0,
+      },
+      to: {
+        line: 0,
+        ch: 0,
+      },
       text: [""],
       removed: [""],
       origin: "",
@@ -98,14 +69,14 @@ export const InputArea: React.FC = () => {
       changeData.origin = "+delete";
     }
 
-    const newSequence = {
+    const newSequence: SequenceData = {
       id: 1,
       partType: "textarea1",
       timestamp: timestamp,
       changeData: changeData,
     };
 
-    setSequenceList([...sequenceList, newSequence]);
+    addNewSequenceData(newSequence);
 
     setBeforeTextInput(textInput);
   }, [textInput, beforeTextInput]);
@@ -113,11 +84,6 @@ export const InputArea: React.FC = () => {
   return (
     <>
       <ReactCodeMirror value={textInput} onChange={onChange} />
-      <input
-        type="checkbox"
-        checked={isRunning}
-        onChange={() => setIsRunning(!isRunning)}
-      />
     </>
   );
 };
