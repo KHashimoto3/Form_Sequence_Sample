@@ -45,6 +45,8 @@ export const InputArea: React.FC = () => {
   useEffect(() => {
     if (isRunning) {
       console.log("カウントアップが開始しました。");
+      setTextInput("");
+      setBeforeTextInput("");
     } else {
       console.log("カウントアップが停止しました。");
       console.log("sequenceList: ", sequenceList);
