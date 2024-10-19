@@ -1,4 +1,9 @@
-import ReactCodeMirror from "@uiw/react-codemirror";
+import "codemirror/lib/codemirror.css";
+import "codemirror/theme/material.css";
+import "codemirror/mode/clike/clike"; // C言語モードをインポート
+import "codemirror/addon/edit/closebrackets"; // 括弧補完のアドオン
+
+import { Controlled as CodeMirror } from "react-codemirror2";
 import { SetStateAction, useCallback, useEffect } from "react";
 
 import React from "react";
@@ -33,9 +38,9 @@ export const InputArea: React.FC = () => {
     isRunning ? delay : null
   );
 
-  const onChange = useCallback((val: SetStateAction<string>) => {
+  /*const onChange = useCallback((val: SetStateAction<string>) => {
     setTextInput(val);
-  }, []);
+  }, []);*/
 
   useEffect(() => {
     if (isRunning) {
@@ -52,7 +57,25 @@ export const InputArea: React.FC = () => {
     setSequenceList([]);
   };
 
-  useEffect(() => {
+  const handleChange = (editor, data, value) => {
+    const { from, to, text, removed } = data;
+    const changeData = {
+      text: text,
+      removed: removed,
+      origin: "",
+    };
+
+    const newSequence = {
+      id: 1,
+      partType: "textarea1",
+      timestamp: timestamp,
+      changeData: changeData,
+    };
+
+    setSequenceList([...sequenceList, newSequence]);
+  };
+
+  /*useEffect(() => {
     if (textInput === beforeTextInput) {
       return;
     }
@@ -74,16 +97,16 @@ export const InputArea: React.FC = () => {
       //console.log("削除" + Math.abs(diffLength), "timestatmp:" + timestamp);
       changeData.removed = [createText(Math.abs(diffLength))];
       changeData.origin = "+delete";
-    }*/
+    }
 
-    /*const result = findAddedAndRemovedChars(beforeTextInput, textInput);
+    const result = findAddedAndRemovedChars(beforeTextInput, textInput);
     if (result.added.length > 0) {
       changeData.text = result.added.map((char) => char.char.repeat(char.count));
       changeData.origin = "+input";
     } else if (result.removed.length > 0) {
       changeData.removed = result.removed.map((char) => char.char.repeat(char.count));
       changeData.origin = "+delete";
-    }*/
+    }
 
     //ライブラリを使用して差分を取得
 
@@ -97,11 +120,26 @@ export const InputArea: React.FC = () => {
     setSequenceList([...sequenceList, newSequence]);
 
     setBeforeTextInput(textInput);
-  }, [textInput, beforeTextInput]);
+  }, [textInput, beforeTextInput]);*/
 
   return (
     <>
-      <ReactCodeMirror value={textInput} onChange={onChange} />
+      <CodeMirror
+        value={textInput}
+        options={{
+          mode: "text/x-csrc",
+          theme: "material",
+          lineNumbers: true,
+          autoCloseBrackets: {
+            pairs: "()[]{}''\"\"",
+            explode: "()[]{}",
+          },
+        }}
+        onBeforeChange={(editor, data, value) => {
+          setTextInput(value);
+        }}
+        onChange={handleChange}
+      />
       <input
         type="checkbox"
         checked={isRunning}
